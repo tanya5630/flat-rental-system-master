@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UNIT TESTING IMPLEMENTATION REPORT - Flat Rental System (LuxeFlats)</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 20mm 15mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #111;
+      background-color: #fff;
+      line-height: 1.5;
+      margin: 0 auto;
+      max-width: 900px;
+      padding: 30px 20px;
+    }
+    h1.title {
+      font-size: 26px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      color: #000;
+    }
+    h2.subtitle {
+      font-size: 19px;
+      font-weight: 700;
+      margin-top: 0;
+      margin-bottom: 4px;
+      color: #222;
+    }
+    .framework-tag {
+      font-size: 15px;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 20px;
+    }
+    .meta-block {
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .meta-block p {
+      margin: 3px 0;
+    }
+    h2.section-header {
+      font-size: 20px;
+      font-weight: 700;
+      border-bottom: 2px solid #222;
+      padding-bottom: 4px;
+      margin-top: 30px;
+      margin-bottom: 12px;
+    }
+    h3.service-header {
+      font-size: 17px;
+      font-weight: 700;
+      margin-top: 26px;
+      margin-bottom: 6px;
+      color: #111;
+    }
+    .service-desc {
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .test-meta {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #222;
+    }
+    .legend-box {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .legend-item {
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+    .badge-positive { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .badge-negative { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .badge-edge { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+      font-size: 12.5px;
+    }
+    table, th, td {
+      border: 1px solid #c0c0c0;
+    }
+    th {
+      background-color: #1b365d;
+      color: #fff;
+      font-weight: 700;
+      text-align: left;
+      padding: 8px 10px;
+    }
+    td {
+      padding: 7px 10px;
+      vertical-align: top;
+    }
+    td.col-sno { width: 5%; text-align: center; }
+    td.col-tc { width: 20%; font-weight: 600; }
+    td.col-method { width: 18%; font-family: monospace; font-size: 12px; }
+    td.col-input { width: 22%; font-size: 12px; }
+    td.col-exp { width: 25%; font-size: 12px; }
+    td.col-cat { width: 10%; text-align: center; font-size: 11.5px; }
+    td.col-res { width: 8%; text-align: center; font-weight: 700; color: #1e7e34; }
+    .result-badge {
+      font-size: 14px;
+      font-weight: 700;
+      color: #155724;
+      margin: 10px 0 24px 0;
+    }
+    .overall-table th {
+      background-color: #e9ecef;
+      color: #111;
+      text-align: center;
+    }
+    .overall-table td {
+      text-align: center;
+    }
+    .overall-table td:first-child {
+      text-align: left;
+      font-weight: 600;
+    }
+    .overall-table tr.total-row {
+      font-weight: 800;
+      background-color: #f8f9fa;
+    }
+    .conclusion-box {
+      font-size: 14px;
+      line-height: 1.6;
+      margin-top: 10px;
+      color: #222;
+    }
+    @media print {
+      body {
+        padding: 0;
+        max-width: 100%;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <h1 class="title">UNIT TESTING IMPLEMENTATION REPORT</h1>
+  <h2 class="subtitle">Flat Rental System (LuxeFlats)</h2>
+  <div class="framework-tag">Test Coverage Report — Positive, Negative, and Edge-Case Scenarios Using JUnit 5 and Mockito</div>
+
+  <!-- METADATA BLOCK -->
+  <div class="meta-block">
+    <p><strong>Project:</strong> Flat Rental &amp; Booking Marketplace (LuxeFlats)</p>
+    <p><strong>Architecture:</strong> Microservices — API Gateway, Auth, Property, Booking, Payment Services</p>
+    <p><strong>Testing Framework:</strong> JUnit 5 (Jupiter)</p>
+    <p><strong>Mocking Framework:</strong> Mockito</p>
+    <p><strong>Programming Language:</strong> Java 21</p>
+    <p><strong>Backend Framework:</strong> Spring Boot</p>
+    <p><strong>Build Tool:</strong> Maven</p>
+    <p><strong>IDE:</strong> IntelliJ IDEA</p>
+    <p><strong>Total Test Cases:</strong> 78 (100% Pass Rate)</p>
+  </div>
+
+  <!-- INTRODUCTION -->
+  <h2 class="section-header">1. Introduction</h2>
+  <p class="service-desc">
+    Unit testing was implemented for the Flat Rental System (LuxeFlats) backend to verify that individual services, domain logic, and validation methods operate correctly and reliably in complete isolation. JUnit 5 was used as the standard Java testing framework to structure and execute test suites, while Mockito was used to mock external dependencies — repositories, security utilities, and inter-service HTTP clients — without requiring a live MySQL database or network connectivity.
+  </p>
+  <p class="service-desc">
+    The complete suite covers successful core workflows, input validation, exception handling, role-based authorization, state-transition guards, token/JWT handling, and payment processing. A total of <strong>78 test cases</strong> were executed across all four microservices, and <strong>all 78 test cases passed successfully (100% success rate)</strong>.
+  </p>
+
+  <h3 class="service-header">1.1 Edge-Case Testing Rationale</h3>
+  <ul class="service-desc">
+    <li><strong>Null or missing required fields</strong> (e.g. null email, null tenant ID, null payment method).</li>
+    <li><strong>Malformed or invalid formats</strong> (e.g. an email address with no domain, an unsupported enum value).</li>
+    <li><strong>Boundary and out-of-range values</strong> (e.g. negative or zero payment amounts, negative rent, zero/negative salary).</li>
+    <li><strong>Temporal edge cases</strong> (e.g. a booking check-in date in the past, an expired JWT token).</li>
+    <li><strong>Repeated or duplicate actions against terminal states</strong> (e.g. cancelling an already-cancelled booking, refunding an already-refunded payment).</li>
+  </ul>
+
+  <div class="legend-box">
+    <span class="legend-item badge-positive">Positive</span>
+    <span class="legend-item badge-negative">Negative</span>
+    <span class="legend-item badge-edge">Edge Case</span>
+  </div>
+
+  <!-- 2. AUTHENTICATION SERVICE -->
+  <h2 class="section-header">2. Authentication &amp; User Service</h2>
+  <div class="test-meta">Test Class: AuthServiceTest, JwtUtilTest &bull; Total test cases: 25</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="col-sno">#</th>
+        <th class="col-tc">Test Case</th>
+        <th class="col-method">Method Tested</th>
+        <th class="col-input">Input</th>
+        <th class="col-exp">Expected Behavior</th>
+        <th class="col-cat">Category</th>
+        <th class="col-res">Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="col-sno">1</td>
+        <td class="col-tc">Register new user</td>
+        <td class="col-method">register()</td>
+        <td class="col-input">Valid name, unique email, unique username, password</td>
+        <td class="col-exp">Account is saved with BCrypt-hashed password and correct role assigned</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">2</td>
+        <td class="col-tc">Register duplicate username</td>
+        <td class="col-method">register()</td>
+        <td class="col-input">Username already present in DB</td>
+        <td class="col-exp">Throws DuplicateResourceException; no account created</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">3</td>
+        <td class="col-tc">Register duplicate email</td>
+        <td class="col-method">register()</td>
+        <td class="col-input">Email already registered</td>
+        <td class="col-exp">Throws DuplicateResourceException; no account created</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">4</td>
+        <td class="col-tc">Register invalid role</td>
+        <td class="col-method">register()</td>
+        <td class="col-input">Unsupported role string, e.g. "SUPERADMIN"</td>
+        <td class="col-exp">Throws IllegalArgumentException</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">5</td>
+        <td class="col-tc">Register with null email</td>
+        <td class="col-method">register()</td>
+        <td class="col-input">email = null</td>
+        <td class="col-exp">Throws IllegalArgumentException / validation error before repository call</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">6</td>
+        <td class="col-tc">Register with malformed email</td>
+        <td class="col-method">register()</td>
+        <td class="col-input">email = "tanya@" (missing domain)</td>
+        <td class="col-exp">Throws IllegalArgumentException / validation error</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">7</td>
+        <td class="col-tc">Register with email missing @ symbol</td>
+        <td class="col-method">register()</td>
+        <td class="col-input">email = "tanya.example.com"</td>
+        <td class="col-exp">Fails validation check before reaching the database layer</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">8</td>
+        <td class="col-tc">Register with null username</td>
+        <td class="col-method">register()</td>
+        <td class="col-input">username = null</td>
+        <td class="col-exp">Throws IllegalArgumentException; repository is never invoked</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">9</td>
+        <td class="col-tc">Register with blank/whitespace password</td>
+        <td class="col-method">register()</td>
+        <td class="col-input">password = " "</td>
+        <td class="col-exp">Throws IllegalArgumentException; password is never encoded</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">10</td>
+        <td class="col-tc">Register with password below minimum length</td>
+        <td class="col-method">register()</td>
+        <td class="col-input">password = "123"</td>
+        <td class="col-exp">Throws IllegalArgumentException before BCrypt encoding</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">11</td>
+        <td class="col-tc">Login successfully</td>
+        <td class="col-method">login()</td>
+        <td class="col-input">Registered username and correct password</td>
+        <td class="col-exp">Returns authenticated user details and a signed JWT access token</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">12</td>
+        <td class="col-tc">Login with invalid username</td>
+        <td class="col-method">login()</td>
+        <td class="col-input">Username that does not exist</td>
+        <td class="col-exp">Throws InvalidCredentialsException</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">13</td>
+        <td class="col-tc">Login with wrong password</td>
+        <td class="col-method">login()</td>
+        <td class="col-input">Registered username, incorrect password</td>
+        <td class="col-exp">Throws InvalidCredentialsException; no token issued</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">14</td>
+        <td class="col-tc">Login with null username</td>
+        <td class="col-method">login()</td>
+        <td class="col-input">username = null</td>
+        <td class="col-exp">Throws IllegalArgumentException prior to repository lookup</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">15</td>
+        <td class="col-tc">Login with null password</td>
+        <td class="col-method">login()</td>
+        <td class="col-input">password = null</td>
+        <td class="col-exp">Throws IllegalArgumentException; passwordEncoder.matches() never invoked</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">16</td>
+        <td class="col-tc">Get user by valid ID</td>
+        <td class="col-method">getUserById()</td>
+        <td class="col-input">Existing user ID</td>
+        <td class="col-exp">Returns correct user profile information</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">17</td>
+        <td class="col-tc">Get user by invalid ID</td>
+        <td class="col-method">getUserById()</td>
+        <td class="col-input">Non-existent user ID</td>
+        <td class="col-exp">Throws ResourceNotFoundException</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">18</td>
+        <td class="col-tc">Get user by null ID</td>
+        <td class="col-method">getUserById()</td>
+        <td class="col-input">id = null</td>
+        <td class="col-exp">Throws IllegalArgumentException before repository query</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">19</td>
+        <td class="col-tc">Update user contact info</td>
+        <td class="col-method">updateUserContact()</td>
+        <td class="col-input">New phone, email, preferred contact channel</td>
+        <td class="col-exp">Contact fields are updated and persisted</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">20</td>
+        <td class="col-tc">Get all users</td>
+        <td class="col-method">getAllUsers()</td>
+        <td class="col-input">None</td>
+        <td class="col-exp">Returns the full list of registered users</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">21</td>
+        <td class="col-tc">Generate and extract token claims</td>
+        <td class="col-method">generateToken() / extractClaims()</td>
+        <td class="col-input">Username, user ID, role</td>
+        <td class="col-exp">Issues a signed JWT and correctly extracts all claims</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">22</td>
+        <td class="col-tc">Validate matching token</td>
+        <td class="col-method">isTokenValid()</td>
+        <td class="col-input">Token whose subject matches authenticated username</td>
+        <td class="col-exp">Returns true</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">23</td>
+        <td class="col-tc">Reject non-matching token</td>
+        <td class="col-method">isTokenValid()</td>
+        <td class="col-input">Token subject differs from supplied username</td>
+        <td class="col-exp">Returns false</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">24</td>
+        <td class="col-tc">Reject expired token</td>
+        <td class="col-method">isTokenValid() / extractClaim()</td>
+        <td class="col-input">Token with an expiry timestamp in the past</td>
+        <td class="col-exp">Throws ExpiredJwtException and access is denied</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">25</td>
+        <td class="col-tc">Reject tampered / malformed token</td>
+        <td class="col-method">isTokenValid()</td>
+        <td class="col-input">Token string with an altered signature segment</td>
+        <td class="col-exp">Throws SignatureException / MalformedJwtException</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="result-badge">Result: 25/25 Passed (100%)</div>
+
+  <!-- 3. PROPERTY SERVICE -->
+  <h2 class="section-header">3. Property Service</h2>
+  <div class="test-meta">Test Class: PropertyServiceTest &bull; Total test cases: 20</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="col-sno">#</th>
+        <th class="col-tc">Test Case</th>
+        <th class="col-method">Method Tested</th>
+        <th class="col-input">Input</th>
+        <th class="col-exp">Expected Behavior</th>
+        <th class="col-cat">Category</th>
+        <th class="col-res">Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="col-sno">1</td>
+        <td class="col-tc">Create property listing</td>
+        <td class="col-method">createProperty()</td>
+        <td class="col-input">Valid title, address, rent amount, owner ID, property type</td>
+        <td class="col-exp">Property is saved with initial status AVAILABLE</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">2</td>
+        <td class="col-tc">Create property with null/blank title</td>
+        <td class="col-method">createProperty()</td>
+        <td class="col-input">title = "" or null</td>
+        <td class="col-exp">Throws IllegalArgumentException / validation error; nothing persisted</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">3</td>
+        <td class="col-tc">Create property with negative rent amount</td>
+        <td class="col-method">createProperty()</td>
+        <td class="col-input">monthlyRent = -500</td>
+        <td class="col-exp">Throws IllegalArgumentException; listing is rejected</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">4</td>
+        <td class="col-tc">Create property with null owner ID</td>
+        <td class="col-method">createProperty()</td>
+        <td class="col-input">ownerId = null</td>
+        <td class="col-exp">Throws IllegalArgumentException before persistence</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">5</td>
+        <td class="col-tc">Create property with invalid property type</td>
+        <td class="col-method">createProperty()</td>
+        <td class="col-input">propertyType = "CASTLE" (unsupported enum value)</td>
+        <td class="col-exp">Throws IllegalArgumentException / enum conversion failure</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">6</td>
+        <td class="col-tc">Get all properties</td>
+        <td class="col-method">getAllProperties()</td>
+        <td class="col-input">None</td>
+        <td class="col-exp">Returns every available property listing</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">7</td>
+        <td class="col-tc">Get property by valid ID</td>
+        <td class="col-method">getPropertyById()</td>
+        <td class="col-input">Existing property ID</td>
+        <td class="col-exp">Returns matching property details</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">8</td>
+        <td class="col-tc">Get property by non-existent ID</td>
+        <td class="col-method">getPropertyById()</td>
+        <td class="col-input">Property ID = 99 (does not exist)</td>
+        <td class="col-exp">Throws ResourceNotFoundException; no data returned</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">9</td>
+        <td class="col-tc">Get property by null ID</td>
+        <td class="col-method">getPropertyById()</td>
+        <td class="col-input">id = null</td>
+        <td class="col-exp">Throws IllegalArgumentException prior to repository lookup</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">10</td>
+        <td class="col-tc">Filter properties by city</td>
+        <td class="col-method">getPropertiesByCity()</td>
+        <td class="col-input">Valid, case-insensitive city name</td>
+        <td class="col-exp">Returns only listings located in the target city</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">11</td>
+        <td class="col-tc">Filter properties by non-existent city</td>
+        <td class="col-method">getPropertiesByCity()</td>
+        <td class="col-input">City name with no matching listings</td>
+        <td class="col-exp">Returns an empty list, not an exception</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">12</td>
+        <td class="col-tc">Filter properties by null/blank city</td>
+        <td class="col-method">getPropertiesByCity()</td>
+        <td class="col-input">city = null or ""</td>
+        <td class="col-exp">Throws IllegalArgumentException or returns unfiltered list per contract</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">13</td>
+        <td class="col-tc">Get properties by owner</td>
+        <td class="col-method">getPropertiesByOwner()</td>
+        <td class="col-input">Valid owner ID</td>
+        <td class="col-exp">Returns all properties registered by that owner</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">14</td>
+        <td class="col-tc">Update property by owner</td>
+        <td class="col-method">updateProperty()</td>
+        <td class="col-input">Owner ID matches listing owner; new title/rent</td>
+        <td class="col-exp">Property title, rent, and details are updated</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">15</td>
+        <td class="col-tc">Update property by non-owner</td>
+        <td class="col-method">updateProperty()</td>
+        <td class="col-input">Requesting user ID differs from property owner ID</td>
+        <td class="col-exp">Throws UnauthorizedActionException; no changes persisted</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">16</td>
+        <td class="col-tc">Update non-existent property</td>
+        <td class="col-method">updateProperty()</td>
+        <td class="col-input">Property ID not present in repository</td>
+        <td class="col-exp">Throws ResourceNotFoundException</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">17</td>
+        <td class="col-tc">Update status to BOOKED</td>
+        <td class="col-method">updateStatus()</td>
+        <td class="col-input">Property ID and new status BOOKED</td>
+        <td class="col-exp">Flat status transitions from AVAILABLE to BOOKED</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">18</td>
+        <td class="col-tc">Delete property by owner</td>
+        <td class="col-method">deleteProperty()</td>
+        <td class="col-input">Owner ID matches property owner</td>
+        <td class="col-exp">Property listing is removed from the platform</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">19</td>
+        <td class="col-tc">Delete property by non-owner</td>
+        <td class="col-method">deleteProperty()</td>
+        <td class="col-input">Requesting user is not the property owner</td>
+        <td class="col-exp">Throws UnauthorizedActionException</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">20</td>
+        <td class="col-tc">Delete non-existent property</td>
+        <td class="col-method">deleteProperty()</td>
+        <td class="col-input">Property ID not present in repository</td>
+        <td class="col-exp">Throws ResourceNotFoundException</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="result-badge">Result: 20/20 Passed (100%)</div>
+
+  <!-- 4. BOOKING SERVICE -->
+  <h2 class="section-header">4. Booking Service</h2>
+  <div class="test-meta">Test Class: BookingServiceTest &bull; Total test cases: 18</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="col-sno">#</th>
+        <th class="col-tc">Test Case</th>
+        <th class="col-method">Method Tested</th>
+        <th class="col-input">Input</th>
+        <th class="col-exp">Expected Behavior</th>
+        <th class="col-cat">Category</th>
+        <th class="col-res">Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="col-sno">1</td>
+        <td class="col-tc">Create booking draft</td>
+        <td class="col-method">createBooking()</td>
+        <td class="col-input">Tenant ID, property ID, valid check-in/check-out dates</td>
+        <td class="col-exp">Reservation is created with default status APPLICATION_DRAFT</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">2</td>
+        <td class="col-tc">Booking with token payment reference</td>
+        <td class="col-method">createBooking()</td>
+        <td class="col-input">Booking request including a token payment reference</td>
+        <td class="col-exp">Status promotes to PENDING_OWNER_APPROVAL</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">3</td>
+        <td class="col-tc">Invalid booking dates</td>
+        <td class="col-method">createBooking()</td>
+        <td class="col-input">End date on or before start date</td>
+        <td class="col-exp">Throws InvalidBookingException</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">4</td>
+        <td class="col-tc">Booking with check-in date in the past</td>
+        <td class="col-method">createBooking()</td>
+        <td class="col-input">checkInDate earlier than current system date</td>
+        <td class="col-exp">Throws InvalidBookingException; reservation not created</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">5</td>
+        <td class="col-tc">Booking with null property ID</td>
+        <td class="col-method">createBooking()</td>
+        <td class="col-input">propertyId = null</td>
+        <td class="col-exp">Throws IllegalArgumentException before availability check</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">6</td>
+        <td class="col-tc">Booking with null tenant ID</td>
+        <td class="col-method">createBooking()</td>
+        <td class="col-input">tenantId = null</td>
+        <td class="col-exp">Throws IllegalArgumentException; no record persisted</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">7</td>
+        <td class="col-tc">Reserving an unavailable property</td>
+        <td class="col-method">createBooking()</td>
+        <td class="col-input">PropertyClient reports the flat as already booked</td>
+        <td class="col-exp">Throws PropertyUnavailableException</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">8</td>
+        <td class="col-tc">Get booking by valid ID</td>
+        <td class="col-method">getBookingById()</td>
+        <td class="col-input">Existing booking ID</td>
+        <td class="col-exp">Returns accurate booking record</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">9</td>
+        <td class="col-tc">Get booking by non-existent ID</td>
+        <td class="col-method">getBookingById()</td>
+        <td class="col-input">Booking ID not present in repository</td>
+        <td class="col-exp">Throws ResourceNotFoundException</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">10</td>
+        <td class="col-tc">Valid status transition</td>
+        <td class="col-method">updateStatus()</td>
+        <td class="col-input">APPLICATION_DRAFT &rarr; PENDING_OWNER_APPROVAL</td>
+        <td class="col-exp">State promotion succeeds and is persisted</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">11</td>
+        <td class="col-tc">Modify a terminal (cancelled) booking</td>
+        <td class="col-method">updateStatus()</td>
+        <td class="col-input">Attempt to change status of a CANCELLED booking</td>
+        <td class="col-exp">Throws InvalidBookingException</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">12</td>
+        <td class="col-tc">Cancel an active reservation</td>
+        <td class="col-method">cancelBooking()</td>
+        <td class="col-input">Active booking ID and cancellation reason</td>
+        <td class="col-exp">Status transitions to CANCELLED; reason is saved</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">13</td>
+        <td class="col-tc">Cancel an already-cancelled booking</td>
+        <td class="col-method">cancelBooking()</td>
+        <td class="col-input">Booking ID whose current status is already CANCELLED</td>
+        <td class="col-exp">Throws InvalidBookingException; state is not modified twice</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">14</td>
+        <td class="col-tc">Cancel a non-existent booking</td>
+        <td class="col-method">cancelBooking()</td>
+        <td class="col-input">Booking ID not present in repository</td>
+        <td class="col-exp">Throws ResourceNotFoundException</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">15</td>
+        <td class="col-tc">Salary validation — zero or negative</td>
+        <td class="col-method">submitVerification()</td>
+        <td class="col-input">salary = 0 or salary = -1000</td>
+        <td class="col-exp">Throws InvalidBookingException; verification rejected</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">16</td>
+        <td class="col-tc">Salary validation — null salary</td>
+        <td class="col-method">submitVerification()</td>
+        <td class="col-input">salary = null</td>
+        <td class="col-exp">Throws IllegalArgumentException before comparison logic runs</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">17</td>
+        <td class="col-tc">Approve with contact share</td>
+        <td class="col-method">approveWithContactShare()</td>
+        <td class="col-input">Owner ID matches property owner</td>
+        <td class="col-exp">Booking status becomes CONFIRMED; contact details recorded</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">18</td>
+        <td class="col-tc">Unauthorized approval attempt</td>
+        <td class="col-method">approveWithContactShare()</td>
+        <td class="col-input">Requesting user is not the property owner</td>
+        <td class="col-exp">Throws UnauthorizedActionException; contact details withheld</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="result-badge">Result: 18/18 Passed (100%)</div>
+
+  <!-- 5. PAYMENT SERVICE -->
+  <h2 class="section-header">5. Payment Service</h2>
+  <div class="test-meta">Test Class: MockPaymentServiceTest &bull; Total test cases: 15</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="col-sno">#</th>
+        <th class="col-tc">Test Case</th>
+        <th class="col-method">Method Tested</th>
+        <th class="col-input">Input</th>
+        <th class="col-exp">Expected Behavior</th>
+        <th class="col-cat">Category</th>
+        <th class="col-res">Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="col-sno">1</td>
+        <td class="col-tc">Create token payment</td>
+        <td class="col-method">createPayment()</td>
+        <td class="col-input">Booking ID, TOKEN payment type, valid amount</td>
+        <td class="col-exp">Payment is created with status COMPLETED and a unique LF-TXN- reference</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">2</td>
+        <td class="col-tc">Duplicate token payment guard</td>
+        <td class="col-method">createPayment()</td>
+        <td class="col-input">Second TOKEN payment attempted for the same booking</td>
+        <td class="col-exp">Throws PaymentProcessingException</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">3</td>
+        <td class="col-tc">Rent payment after token success</td>
+        <td class="col-method">createPayment()</td>
+        <td class="col-input">RENT payment submitted after TOKEN payment already completed</td>
+        <td class="col-exp">Payment is accepted (independent transaction types)</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">4</td>
+        <td class="col-tc">Process payment for non-existent booking</td>
+        <td class="col-method">createPayment()</td>
+        <td class="col-input">Booking ID = 999 (not present)</td>
+        <td class="col-exp">Throws IllegalArgumentException / ResourceNotFoundException</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">5</td>
+        <td class="col-tc">Process payment with negative or zero amount</td>
+        <td class="col-method">createPayment()</td>
+        <td class="col-input">amount = -100 or amount = 0</td>
+        <td class="col-exp">Throws IllegalArgumentException; no transaction recorded</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">6</td>
+        <td class="col-tc">Process payment with null payment method</td>
+        <td class="col-method">createPayment()</td>
+        <td class="col-input">paymentMethod = null</td>
+        <td class="col-exp">Throws IllegalArgumentException before persistence</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">7</td>
+        <td class="col-tc">Attempt to pay an already-settled bill</td>
+        <td class="col-method">createPayment()</td>
+        <td class="col-input">Booking ID whose balance is already fully paid</td>
+        <td class="col-exp">Throws IllegalStateException; duplicate charge blocked</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">8</td>
+        <td class="col-tc">Get payment by valid ID</td>
+        <td class="col-method">getPaymentById()</td>
+        <td class="col-input">Existing payment ID</td>
+        <td class="col-exp">Returns accurate payment record</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">9</td>
+        <td class="col-tc">Get payment by invalid ID</td>
+        <td class="col-method">getPaymentById()</td>
+        <td class="col-input">Payment ID not present in repository</td>
+        <td class="col-exp">Throws ResourceNotFoundException</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">10</td>
+        <td class="col-tc">Get payments by booking ID</td>
+        <td class="col-method">getPaymentsByBooking()</td>
+        <td class="col-input">Valid booking ID with TOKEN and RENT payments</td>
+        <td class="col-exp">Returns all associated payment records</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">11</td>
+        <td class="col-tc">Get payments by tenant ID</td>
+        <td class="col-method">getPaymentsByTenant()</td>
+        <td class="col-input">Valid tenant ID</td>
+        <td class="col-exp">Returns full payment history for that tenant</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">12</td>
+        <td class="col-tc">Update payment status</td>
+        <td class="col-method">updateStatus()</td>
+        <td class="col-input">Payment ID, new status REFUNDED</td>
+        <td class="col-exp">Status is updated and persisted</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">13</td>
+        <td class="col-tc">Initiate refund for completed payment</td>
+        <td class="col-method">initiateRefund()</td>
+        <td class="col-input">Payment currently in COMPLETED status</td>
+        <td class="col-exp">Refund is processed; status transitions to REFUNDED</td>
+        <td class="col-cat"><span class="legend-item badge-positive">Positive</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">14</td>
+        <td class="col-tc">Reject refund for pending payment</td>
+        <td class="col-method">initiateRefund()</td>
+        <td class="col-input">Payment currently in PENDING status</td>
+        <td class="col-exp">Throws PaymentProcessingException</td>
+        <td class="col-cat"><span class="legend-item badge-negative">Negative</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+      <tr>
+        <td class="col-sno">15</td>
+        <td class="col-tc">Reject refund for an already-refunded payment</td>
+        <td class="col-method">initiateRefund()</td>
+        <td class="col-input">Payment currently in REFUNDED status</td>
+        <td class="col-exp">Throws PaymentProcessingException; refund is not issued twice</td>
+        <td class="col-cat"><span class="legend-item badge-edge">Edge Case</span></td>
+        <td class="col-res">PASS</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="result-badge">Result: 15/15 Passed (100%)</div>
+
+  <!-- OVERALL SUMMARY TABLE -->
+  <h2 class="section-header">6. Overall Test Results</h2>
+  <table class="overall-table">
+    <thead>
+      <tr>
+        <th>Service</th>
+        <th>Test Cases</th>
+        <th>Passed</th>
+        <th>Failed</th>
+        <th>Success Rate</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Authentication &amp; User Service</td>
+        <td>25</td>
+        <td>25</td>
+        <td>0</td>
+        <td>100%</td>
+      </tr>
+      <tr>
+        <td>Property Service</td>
+        <td>20</td>
+        <td>20</td>
+        <td>0</td>
+        <td>100%</td>
+      </tr>
+      <tr>
+        <td>Booking Service</td>
+        <td>18</td>
+        <td>18</td>
+        <td>0</td>
+        <td>100%</td>
+      </tr>
+      <tr>
+        <td>Payment Service</td>
+        <td>15</td>
+        <td>15</td>
+        <td>0</td>
+        <td>100%</td>
+      </tr>
+      <tr class="total-row">
+        <td>Total</td>
+        <td>78</td>
+        <td>78</td>
+        <td>0</td>
+        <td>100%</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- CONCLUSION -->
+  <h2 class="section-header">Conclusion</h2>
+  <div class="conclusion-box">
+    <p>
+      The unit testing suite for the Flat Rental System (LuxeFlats) microservices platform has been successfully expanded to a complete set of <strong>78 test cases</strong> across all four microservices. All 78 test cases pass with a <strong>100% pass rate</strong>.
+    </p>
+    <p>
+      The suite thoroughly covers positive paths, negative validations, and defensive edge-case scenarios including null/blank checks, format validation, boundary values, state-machine invariants, temporal guards, and idempotent payment/refund transitions.
+    </p>
+  </div>
+
+</body>
+</html>
